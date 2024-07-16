@@ -1,5 +1,6 @@
 package com.hackathon.authservice.controller;
 
+import com.hackathon.authservice.dto.LoginRequest;
 import com.hackathon.authservice.model.User;
 import com.hackathon.authservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,5 +26,17 @@ public class UserController {
         }
         userService.registerUser(user);
         return ResponseEntity.ok("User registered successfully");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestBody @Valid LoginRequest loginRequest, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body("Invalid data");
+        }
+        boolean isValidUser = userService.validateUser(loginRequest.getEmail(), loginRequest.getPassword());
+        if (!isValidUser) {
+            return ResponseEntity.status(401).body("Invalid email or password");
+        }
+        return ResponseEntity.ok("Login successful");
     }
 }
